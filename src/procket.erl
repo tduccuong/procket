@@ -338,7 +338,8 @@
     | {progname, string()}
     | {interface, string()}
     | {pipe, string()}
-    | {namespace, string()}.
+    | {namespace, string()}
+    | {ipv6_v6only, boolean()}.
 
 -export_type([
     uint16_t/0,
@@ -1332,6 +1333,13 @@ optarg({dev, Dev}) when is_list(Dev) ->
     end;
 optarg({namespace, NS}) when is_list(NS) ->
     switch("N", NS);
+optarg({ipv6_v6only, Bool}) when is_boolean(Bool) ->
+    case Bool of
+        true ->
+            switch("O", 1);
+        false ->
+            switch("O", 0)
+    end;
 % Ignore any other arguments
 optarg(_Arg) ->
     "".

@@ -49,6 +49,7 @@ open(Port, Options) -> {ok, FD} | {error, posix()}
                 | {interface, string()}
                 | {pipe, string()}
                 | {namespace, string()}
+                | {ipv6_v6only, boolean()}
             Protocol = protocol() | integer()
             Type = type() | integer()
             Family = family() | integer()

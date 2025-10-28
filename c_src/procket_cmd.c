@@ -69,7 +69,9 @@ int main(int argc, char *argv[]) {
 
   ps->fdtype = PROCKET_FD_SOCKET;
 
-  while ((ch = getopt(argc, argv, "b:d:F:hI:N:p:P:T:u:v")) != -1) {
+  ps->v6only = -1;
+
+  while ((ch = getopt(argc, argv, "b:d:F:hI:N:O:p:P:T:u:v")) != -1) {
     switch (ch) {
     case 'b': /* listen backlog */
       ps->backlog = atoi(optarg);
@@ -102,6 +104,9 @@ int main(int argc, char *argv[]) {
 
       if (ps->ns == NULL)
         error_result(ps, errno);
+      break;
+    case 'O': /* listen on IPv6 only */
+      ps->v6only = atoi(optarg);
       break;
     case 'p': /* port */
       ps->port = strdup(optarg);
@@ -327,6 +332,12 @@ int procket_create_socket(PROCKET_STATE *ps) {
   if (fcntl(ps->s, F_SETFL, flags | O_NONBLOCK) < 0)
     goto ERR;
 
+  if (ps->family == AF_INET6 && ps->v6only != -1) {
+    if (setsockopt(ps->s, IPPROTO_IPV6, IPV6_V6ONLY, &ps->v6only,
+                   sizeof(ps->v6only)) < 0)
+      goto ERR;
+  }
+
   return 0;
 
 ERR:
@@ -463,6 +474,7 @@ void usage(PROCKET_STATE *ps) {
       "              -I <name>        interface [default: ANY]\n"
 #endif
       "              -N <namespace>   Linux namespace to open the socket in\n"
+      "              -O [0 | 1]       set IPV6_V6ONLY socket option\n"
       "              -p <port>        port\n"
       "              -P <protocol>    protocol [default: IPPROTO_TCP]\n"
       "              -T <type>        type [default: SOCK_STREAM]\n"

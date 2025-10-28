@@ -89,4 +89,5 @@ typedef struct {
     int type;               /* socket type: SOCK_STREAM */
     int protocol;           /* socket protocol: IPPROTO_TCP */
     int backlog;            /* Listen backlog */
+    int v6only;             /* IPV6_V6ONLY socket option */
 } PROCKET_STATE;
