@@ -74,19 +74,34 @@ int main(int argc, char *argv[]) {
     case 'b': /* listen backlog */
       ps->backlog = atoi(optarg);
       break;
+    case 'd': /* Open a character device */
+      ps->dev = strdup(optarg);
+
+     if (ps->dev == NULL)
+        error_result(ps, errno);
+
+      if (procket_check_devname(ps->dev, 32) < 0)
+        usage(ps);
+
+      ps->fdtype = PROCKET_FD_CHARDEV;
+      break;
     case 'F': /* socket family/domain */
       ps->family = atoi(optarg);
       break;
-    case 'u': /* path to Unix socket */
-      ps->path = strdup(optarg);
+    case 'I': /* Interface name */
+      ps->ifname = strdup(optarg);
 
-      if (ps->path == NULL)
+      if (ps->ifname == NULL)
         error_result(ps, errno);
 
-      ps->pathlen = strlen(ps->path);
-
-      if (ps->pathlen >= UNIX_PATH_MAX)
+      if (strlen(ps->ifname) >= IFNAMSIZ)
         error_result(ps, ENAMETOOLONG);
+      break;
+    case 'N': /* namespace */
+      ps->ns = strdup(optarg);
+
+      if (ps->ns == NULL)
+        error_result(ps, errno);
       break;
     case 'p': /* port */
       ps->port = strdup(optarg);
@@ -103,31 +118,16 @@ int main(int argc, char *argv[]) {
     case 'T': /* socket type */
       ps->type = atoi(optarg);
       break;
-    case 'I': /* Interface name */
-      ps->ifname = strdup(optarg);
+    case 'u': /* path to Unix socket */
+      ps->path = strdup(optarg);
 
-      if (ps->ifname == NULL)
+      if (ps->path == NULL)
         error_result(ps, errno);
 
-      if (strlen(ps->ifname) >= IFNAMSIZ)
+      ps->pathlen = strlen(ps->path);
+
+      if (ps->pathlen >= UNIX_PATH_MAX)
         error_result(ps, ENAMETOOLONG);
-      break;
-    case 'd': /* Open a character device */
-      ps->dev = strdup(optarg);
-
-      if (ps->dev == NULL)
-        error_result(ps, errno);
-
-      if (procket_check_devname(ps->dev, 32) < 0)
-        usage(ps);
-
-      ps->fdtype = PROCKET_FD_CHARDEV;
-      break;
-    case 'N': /* namespace */
-      ps->ns = strdup(optarg);
-
-      if (ps->ns == NULL)
-        error_result(ps, errno);
       break;
     case 'v':
       ps->verbose++;
@@ -456,15 +456,17 @@ void usage(PROCKET_STATE *ps) {
       stderr,
       "usage: %s <options> <ipaddress>\n"
       "              -b <backlog>     listen socket backlog [default:%d]\n"
-      "              -u <path>        path to Unix socket\n"
-      "              -p <port>        port\n"
+      "              -d <name>        open device\n"
       "              -F <family>      family [default: PF_UNSPEC]\n"
-      "              -P <protocol>    protocol [default: IPPROTO_TCP]\n"
-      "              -T <type>        type [default: SOCK_STREAM]\n"
+      "              -h               display this help text\n"
 #ifdef SO_BINDTODEVICE
       "              -I <name>        interface [default: ANY]\n"
 #endif
-      "              -d <name>        open device\n"
+      "              -N <namespace>   Linux namespace to open the socket in\n"
+      "              -p <port>        port\n"
+      "              -P <protocol>    protocol [default: IPPROTO_TCP]\n"
+      "              -T <type>        type [default: SOCK_STREAM]\n"
+      "              -u <path>        path to Unix socket\n"
       "              -v               verbose mode\n",
       __progname, BACKLOG);
 
