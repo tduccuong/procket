@@ -1,7 +1,8 @@
 *.[oa]
 *.beam
 ebin/
-priv/
+priv/procket
+priv/procket.so
 [._]*.s[a-w][a-z]
 [._]s[a-w][a-z]
 *.un~
@@ -13,3 +14,4 @@ _build/
 .rebar3/
 deps/
 doc/
+config/
