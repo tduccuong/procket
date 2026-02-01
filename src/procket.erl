@@ -367,8 +367,8 @@ on_load() ->
             <<"amd64", _/binary>> -> "procket_amd64";
             _ -> "procket_amd64"
         end,
-    SoPath = filename:join([code:priv_dir(?MODULE), SoFile ++ ".so"]),
-    io:format("Loading procket NIF from ~s~n", [SoPath]),
+    SoPath = filename:join([code:priv_dir(?MODULE), SoFile]),
+    io:format("Loading procket NIF from ~s.so~n", [SoPath]),
     erlang:load_nif(SoPath, 0).
 
 %%--------------------------------------------------------------------
