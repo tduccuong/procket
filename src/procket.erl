@@ -359,7 +359,17 @@
 -on_load(on_load/0).
 
 on_load() ->
-    erlang:load_nif(progname(), []).
+    SoFile =
+        case list_to_binary(erlang:system_info(system_architecture)) of
+            <<"aarch64", _/binary>> -> "procket_arm64";
+            <<"x86_64", _/binary>> -> "procket_amd64";
+            <<"arm", _/binary>> -> "procket_arm32";
+            <<"amd64", _/binary>> -> "procket_amd64";
+            _ -> "procket_amd64"
+        end,
+    SoPath = filename:join([code:priv_dir(?MODULE), SoFile ++ ".so"]),
+    io:format("Loading procket NIF from ~s~n", [SoPath]),
+    erlang:load_nif(SoPath, 0).
 
 %%--------------------------------------------------------------------
 %%% NIF Stubs
