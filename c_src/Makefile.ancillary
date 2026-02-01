@@ -1,6 +1,8 @@
 # Build ancillary library
 
-CFLAGS = -Wall -fPIC -g -O2 -DNDEBUG -DSPARE_SEND_FDS -DSPARE_RECV_FDS -U_FORTIFY_SOURCE -D_FORTIFY_SOURCE=0
+# ARCH_FLAG passed from parent Makefile
+ARCH_FLAG ?=
+CFLAGS = -Wall -fPIC -g -O2 -DNDEBUG -DSPARE_SEND_FDS -DSPARE_RECV_FDS -U_FORTIFY_SOURCE -D_FORTIFY_SOURCE=0 $(ARCH_FLAG)
 OBJS = fd_send.o fd_recv.o
 TARGET = libancillary.a
 
